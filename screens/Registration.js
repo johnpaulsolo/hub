@@ -80,7 +80,7 @@ class Registration extends Component {
         );
     }
 
-    _signin = async () => {
+    _signup = async () => {
         await this.setState({
             loading: true
         });
@@ -90,21 +90,24 @@ class Registration extends Component {
             url: 'https://serene-cliffs-80945.herokuapp.com/api',
             data: {
                 query: `
-                    {
-                        login( Username: "${this.state.username}" Password: "${this.state.password}"){
-                            userId
-                            token
-                            tokenExpiration
-                            userType
+                    mutation {
+                        CreateAccount(newAccount: {
+                            Username: "${this.state.username}",
+                            Email: "${this.state.email}",
+                            FName: "${this.state.fname}",
+                            LName: "${this.state.lname}",
+                            Password: "${this.state.password}",
+                            Phone: "${this.state.phone}"
+                            UserType: "client"
+                        }){
+                            _id
+                            Username
                         }
                     }
                 `
             }
         }).then(result => {
-            AsyncStorage.setItem('userId', result.data.data.login.userId);
-            AsyncStorage.setItem('userType', result.data.data.login.userType);
-
-            this.props.navigation.navigate('Root');
+            this.props.navigation.navigate('Success');
         }).catch(err => {
                 this.setState({
                     loading: false
