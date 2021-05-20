@@ -73,6 +73,31 @@ export default class TabOneScreen extends Component {
   componentDidMount = async () => {
     await AsyncStorage.getItem('userId').then(result => {
       result ? this.setState({ userId: result }) : this.props.navigation.navigate('Login');
+
+      axios({
+        url: 'https://serene-cliffs-80945.herokuapp.com/api',
+        method: 'POST',
+        data: {
+          query:`
+            {
+              UserPendingTransactions(User:"${result}"){
+                _id
+                Status
+              }
+            }
+          `
+        }
+      }).then( result => {
+        // alert(JSON.stringify(result))
+        this.setState({
+          findingRider: true
+        })
+        this._searching(result.data.data.UserPendingTransactions._id)
+      }).catch( err => {
+        this.setState({
+          findingRider: false
+        })
+      })
     })
 
     await navigator.geolocation.getCurrentPosition(
@@ -225,7 +250,7 @@ export default class TabOneScreen extends Component {
       data: {
         query:`
           {
-            Transaction(Hub: "${id}"){
+            Searching(TripId: "${id}"){
               _id
               Status
             }
@@ -233,7 +258,7 @@ export default class TabOneScreen extends Component {
         `
       }
     }).then(result => {
-      result.data.data.Transaction.Status == "Accepted" ?
+      result.data.data.Searching.Status == "Accepted" ?
         this.setState({
           riderDetails: {
             rName: "Mr. Juan dela cruz",
