@@ -13,6 +13,7 @@ import MapView, { AnimatedRegion, Marker } from 'react-native-maps';
 import Geofence from 'react-native-expo-geofence';
 import { Card, Text, Input, Button, Badge } from 'react-native-elements';
 import axios from 'axios';
+import { ThemeProvider } from '@react-navigation/native';
 
 
 export default class TabOneScreen extends Component {
@@ -28,6 +29,7 @@ export default class TabOneScreen extends Component {
       book: false,
       notes: null,
       findingRider: false,
+      tripStatus: null,
       riderDetails: null,
       currentLocation: {
         longitude: 'unknown', //Initial Longitude
@@ -258,14 +260,47 @@ export default class TabOneScreen extends Component {
         `
       }
     }).then(result => {
-      result.data.data.Searching.Status == "Accepted" ?
+      if (result.data.data.Searching.Status == "Accepted") {
         this.setState({
           riderDetails: {
             rName: "Mr. Juan dela cruz",
             plateNo: "xxx-123"
+          },
+          tripStatus: result.data.data.Searching.Status
+        });
+        this._finishedTrip(id);
+      } else {
+        this._searching(id)
+      }
+    }).catch(err => {
+      alert(err)
+    })
+  }
+
+  _finishedTrip = (id) => {
+    axios({
+      url: 'https://serene-cliffs-80945.herokuapp.com/api',
+      method: 'POST',
+      data: {
+        query:`
+          {
+            Searching(TripId: "${id}"){
+              _id
+              Status
+            }
           }
+        `
+      }
+    }).then(result => {
+      result.data.data.Searching.Status == "Completed" ?
+        this.setState({
+          riderDetails: {
+            rName: "Mr. Juan dela cruz",
+            plateNo: "xxx-123"
+          },
+          tripStatus: result.data.data.Searching.Status
         }) :
-      this._searching(id)
+      this._finishedTrip(id);
     }).catch(err => {
       alert(err)
     })
@@ -397,14 +432,34 @@ export default class TabOneScreen extends Component {
 
         { this.state.findingRider ? 
             this.state.riderDetails ?
-              <View style={styles.loading}>
-                <Text h1>You Found a Rider</Text>
-                <Image
-                  source={require('../assets/images/man.png')}
-                />
-                <Text h1>{this.state.riderDetails.rName}</Text>
-                <Text h1>Plate No. {this.state.riderDetails.plateNo}</Text>
-              </View>
+                this.state.tripStatus == "Completed" ? 
+                  <View style={styles.loading}>
+                    <Text h1>Successfully Completed the Trip</Text>
+                    <Image
+                      source={require('../assets/images/man.png')}
+                    />
+                    <Text h1>{this.state.riderDetails.rName}</Text>
+                    <Text h1>Plate No. {this.state.riderDetails.plateNo}</Text>
+                    <Button
+                      title="Book Again"
+                      onPress={
+                        () => {
+                          this.setState({
+                            findingRider: null
+                          })
+                        }
+                      }
+                    />
+                  </View>
+                  :
+                  <View style={styles.loading}>
+                    <Text h1>You Found a Rider</Text>
+                    <Image
+                      source={require('../assets/images/man.png')}
+                    />
+                    <Text h1>{this.state.riderDetails.rName}</Text>
+                    <Text h1>Plate No. {this.state.riderDetails.plateNo}</Text>
+                  </View>
             :
               <View style={styles.loading}>
                 <Text h1>Finding Rider</Text>
