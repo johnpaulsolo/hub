@@ -71,15 +71,21 @@ export default class TabTwoScreen extends Component {
                       <Text style={{marginBottom: 10, color: 'black'}}>
                         Notes: { result.Notes }
                       </Text>
-                      <Text style={{marginBottom: 10, color: 'black'}}>
-                        Driver Name: { result.Driver.FName } { result.Driver.LName }
-                      </Text>
-                      <Text style={{marginBottom: 10, color: 'black'}}>
-                        Plate No: { result.Driver.PlateNo }
-                      </Text>
-                      <Text style={{marginBottom: 10, color: 'black'}}>
-                        Vehicle: { result.Driver.Vehicle }
-                      </Text>
+                      {
+                        result.Driver ?
+                          <Card>
+                            <Text style={{marginBottom: 10, color: 'black'}}>
+                              Driver Name: { result.Driver.FName } { result.Driver.LName }
+                            </Text>
+                            <Text style={{marginBottom: 10, color: 'black'}}>
+                              Plate No: { result.Driver.PlateNo }
+                            </Text>
+                            <Text style={{marginBottom: 10, color: 'black'}}>
+                              Vehicle: { result.Driver.Vehicle }
+                            </Text>
+                          </Card>
+                        : null
+                      }
                     </Card>
                 )
             })
