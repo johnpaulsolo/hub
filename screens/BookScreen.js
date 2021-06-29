@@ -397,37 +397,39 @@ export default class TabOneScreen extends Component {
                 </Card>
               </View>
             :
-              <View style={styles.search}>
-                <Input
-                  placeholder='Drop Off Location'
-                  onChangeText={value => this.setState({ dropOff: value })}
-                />
-                <Button
-                  title='search'
-                  onPress={async () => {
-                    // search(this.state.dropOff)
-                    const coords = await Location.geocodeAsync(this.state.dropOff)
+              this.state.region.latitude ?
+                <View style={styles.search}>
+                  <Input
+                    placeholder='Drop Off Location'
+                    onChangeText={value => this.setState({ dropOff: value })}
+                  />
+                  <Button
+                    title='search'
+                    onPress={async () => {
+                      // search(this.state.dropOff)
+                      const coords = await Location.geocodeAsync(this.state.dropOff)
 
-                    await coords.length === 0 ? 
-                        alert('place does not exist') 
-                      : this.setState({
-                        region: {
-                          latitude: coords[0].latitude,
-                          longitude: coords[0].longitude,
-                          latitudeDelta: 0.0050,
-                          longitudeDelta: 0.0050,
-                        },
-                        dropOffLoc: {
-                          latitude: coords[0].latitude,
-                          longitude: coords[0].longitude
-                        },
-                        book: true
-                      })
-                    
-                    await this._getAddress()
-                  }}
-                />
-              </View>
+                      await coords.length === 0 ? 
+                          alert('place does not exist') 
+                        : this.setState({
+                          region: {
+                            latitude: coords[0].latitude,
+                            longitude: coords[0].longitude,
+                            latitudeDelta: 0.0050,
+                            longitudeDelta: 0.0050,
+                          },
+                          dropOffLoc: {
+                            latitude: coords[0].latitude,
+                            longitude: coords[0].longitude
+                          },
+                          book: true
+                        })
+                      
+                      await this._getAddress()
+                    }}
+                  />
+                </View>
+              : null
         }
 
         { this.state.findingRider ? 

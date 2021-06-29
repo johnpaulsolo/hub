@@ -87,10 +87,21 @@ class Login extends Component {
                 `
             }
         }).then(result => {
-            AsyncStorage.setItem('userId', result.data.data.login.userId);
-            AsyncStorage.setItem('userType', result.data.data.login.userType);
+            if (result.data.data.login.userType == 'client') {
+                AsyncStorage.setItem('userId', result.data.data.login.userId);
+                AsyncStorage.setItem('userType', result.data.data.login.userType);
 
-            this.props.navigation.navigate('Root');
+                this.setState({
+                    loading: false
+                });
+
+                this.props.navigation.navigate('Root');
+            } else {
+                this.setState({
+                    loading: false
+                });
+                alert('Invalid username or password')
+            }     
         }).catch(err => {
                 this.setState({
                     loading: false
