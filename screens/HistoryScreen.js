@@ -1,42 +1,89 @@
 import React, { Component } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { Card, Button, Icon } from 'react-native-elements';
+import axios from 'axios';
 
 export default class TabTwoScreen extends Component {
+  constructor(props){
+    super(props);
+    
+    this.state = {
+      history: []
+    }
+  }
+
+  componentDidMount = async () => {
+    await AsyncStorage.getItem('userId').then(result => {
+      result ? this.setState({ userId: result }) : this.props.navigation.navigate('Login');
+
+      axios({
+        url: 'https://serene-cliffs-80945.herokuapp.com/api',
+        method: 'POST',
+        data: {
+          query:`
+            {
+              ProfileTransaction(User:"${result}"){
+                Notes
+                Status
+                DropAddress
+                PickAddress
+                Driver{
+                  FName
+                  LName
+                  Vehicle
+                  PlateNo
+                }
+              }
+            }
+          `
+        }
+      }).then( result => {
+        this.setState({
+          history: result.data.data.ProfileTransaction
+        })
+      }).catch( err => {
+        alert(err)
+      })
+    })
+  }
+
   render () {
     return (
       <View style={styles.container}>
 
         <ScrollView>
-          <Card>
-            <Card.Title>Date</Card.Title>
-            <Card.Divider/>
-            <Card.Image source={{ uri: 'https://i.pinimg.com/originals/7c/51/98/7c5198d2a0751fa76c8433dba4a1a12a.jpg' }}/>
-              <Text style={{marginBottom: 10, color: 'black'}}>
-                Description of travel and location, hub used and price
-              </Text>
-              <Button
-                icon={<Icon name='code' color='#ffffff' />}
-                buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-                title='VIEW NOW' />
-          </Card>
-
-          <Card>
-            <Card.Title>Date</Card.Title>
-            <Card.Divider/>
-            <Card.Image source={{ uri: 'https://i.pinimg.com/originals/7c/51/98/7c5198d2a0751fa76c8433dba4a1a12a.jpg' }}/>
-              <Text style={{marginBottom: 10, color: 'black'}}>
-                Description of travel and location, hub used and price
-              </Text>
-              <Button
-                icon={<Icon name='code' color='#ffffff' />}
-                buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-                title='VIEW NOW' />
-          </Card>
-
+          {
+            this.state.history.map(result => {
+                return(
+                    <Card>
+                      <Card.Title>{ result.Status }</Card.Title>
+                      <Card.Divider/>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Location: { result.PickAdress }
+                      </Text>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Drop Off: { result.DropAddress }
+                      </Text>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Notes: { result.Notes }
+                      </Text>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Driver Name: { result.Driver.FName } { result.Driver.LName }
+                      </Text>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Plate No: { result.Driver.PlateNo }
+                      </Text>
+                      <Text style={{marginBottom: 10, color: 'black'}}>
+                        Vehicle: { result.Driver.Vehicle }
+                      </Text>
+                    </Card>
+                )
+            })
+          }
           <Card>
             <Card.Title>Date</Card.Title>
             <Card.Divider/>
