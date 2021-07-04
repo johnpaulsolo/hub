@@ -361,7 +361,7 @@ export default class TabOneScreen extends Component {
                     resizeMode="contain"
                   ></Marker>
                 : null}
-              {this.state.markers.map((marker, index) => (
+              {/* {this.state.markers.map((marker, index) => (
                 <Marker
                   key={index}
                   coordinate={marker.coordinates}
@@ -371,7 +371,7 @@ export default class TabOneScreen extends Component {
                   onPress={()=>getlocation(marker.title)}
                 >
                 </Marker>
-              ))}
+              ))} */}
             </MapView>
           :
             <Text>Loading</Text>
@@ -467,6 +467,9 @@ export default class TabOneScreen extends Component {
                 <Text h1>Finding Rider</Text>
                 <Image
                   source={require('../assets/images/man.png')}
+                />
+                <Image
+                  source={require('../assets/images/loading.gif')}
                 />
               </View>
           :

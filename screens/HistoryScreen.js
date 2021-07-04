@@ -90,18 +90,6 @@ export default class TabTwoScreen extends Component {
                 )
             })
           }
-          <Card>
-            <Card.Title>Date</Card.Title>
-            <Card.Divider/>
-            <Card.Image source={{ uri: 'https://i.pinimg.com/originals/7c/51/98/7c5198d2a0751fa76c8433dba4a1a12a.jpg' }}/>
-              <Text style={{marginBottom: 10, color: 'black'}}>
-                Description of travel and location, hub used and price
-              </Text>
-              <Button
-                icon={<Icon name='code' color='#ffffff' />}
-                buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
-                title='VIEW NOW' />
-          </Card>
         </ScrollView>
         {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <EditScreenInfo path="/screens/TabTwoScreen.tsx" /> */}
