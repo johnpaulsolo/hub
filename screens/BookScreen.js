@@ -96,9 +96,7 @@ export default class TabOneScreen extends Component {
         })
         this._searching(result.data.data.UserPendingTransactions._id)
       }).catch( err => {
-        this.setState({
-          findingRider: false
-        })
+        this._accepted(this.state.userId)
       })
     })
 
@@ -183,17 +181,21 @@ export default class TabOneScreen extends Component {
 
   _getAddress = async () => {
     // const { status } = await Permissions.askAsync(Permissions.LOCATION)
-    // const locdata = { latitude: this.state.currentLocation.latitude, longitude: this.state.currentLocation.longitude }
-    const locdata = {latitude: 14.636869, longitude: 120.975428}
+    const locdata = { latitude:  Number(this.state.currentLocation.latitude), longitude:  Number(this.state.currentLocation.longitude) }
+    // const locdata = {latitude: 14.636869, longitude: 120.975428}
+    // const location = await Location.reverseGeocodeAsync(locdata)
+    // const coords = await Location.geocodeAsync("maypajo")
 
-    const location = await Location.reverseGeocodeAsync(locdata)
+    let response = await Location.reverseGeocodeAsync(locdata);
 
-    const coords = await Location.geocodeAsync("maypajo")
+    for (let item of response) {
+      let address = `${item.name}, ${item.street}, ${item.postalCode}, ${item.city}`;
 
-    this.setState({
-      address: location,
-      coords: coords
-    })
+      this.setState({
+        address: address,
+        coords: locdata
+      })
+    }
   }
 
   _geoFencing = async () => {
@@ -216,7 +218,7 @@ export default class TabOneScreen extends Component {
             CreateTransaction(newTransaction:{
               UserId: "${this.state.userId}",
               Notes: "${this.state.notes}",
-              PickAddress: "Maypajo (Needs API)",
+              PickAddress: "${this.state.address}",
               DropAddress: "${this.state.dropOff}",
               PickLat: ${this.state.currentLocation.latitude},
               PickLong: ${this.state.currentLocation.longitude},
@@ -261,19 +263,57 @@ export default class TabOneScreen extends Component {
       }
     }).then(result => {
       if (result.data.data.Searching.Status == "Accepted") {
-        this.setState({
-          riderDetails: {
-            rName: "Mr. Juan dela cruz",
-            plateNo: "xxx-123"
-          },
-          tripStatus: result.data.data.Searching.Status
-        });
-        this._finishedTrip(id);
+        this._accepted(this.state.userId)
       } else {
         this._searching(id)
       }
     }).catch(err => {
-      alert(err)
+      this.setState({
+        findingRider: false
+      })
+    })
+  }
+
+  _accepted = (id) => {
+    axios({
+      url: 'https://serene-cliffs-80945.herokuapp.com/api',
+      method: 'POST',
+      data: {
+        query:`
+          {
+            UserAcceptedTransactions( User:"${id}"){
+              _id
+              Status
+              Driver {
+                FName
+                LName
+                Phone
+                Vehicle
+                PlateNo
+              }
+            }
+          }
+        `
+      }
+    }).then(result => {
+      if (result.data.data.UserAcceptedTransactions.Status == "Accepted") {
+        this.setState({
+          findingRider: true,
+          riderDetails: {
+            rName: `${result.data.data.UserAcceptedTransactions.Driver.FName} ${result.data.data.UserAcceptedTransactions.Driver.LName}`,
+            plateNo: `${result.data.data.UserAcceptedTransactions.Driver.PlateNo}`,
+            rPhone: `${result.data.data.UserAcceptedTransactions.Driver.Phone}`
+          },
+          tripStatus: result.data.data.UserAcceptedTransactions.Status
+        });
+        this._accepted(id);
+      } else {
+        this._finishedTrip(result.data.data.UserAcceptedTransactions._id)
+      }
+    }).catch(err => {
+      this.setState({
+        findingRider: false
+      })
     })
   }
 
@@ -383,7 +423,7 @@ export default class TabOneScreen extends Component {
                   <Card.Title>Confirm Pick-up and Drop off</Card.Title>
                   <Card.Divider/>
                     <Badge status="primary" value={<Text style={styles.bText}>Pick Up: </Text>}/>
-                    <Text style={styles.bText}>Needs API KEY</Text>
+                    <Text style={styles.bText}>{this.state.address}</Text>
                     <Badge status="success" value={<Text style={styles.bText}>Drop Off: </Text>}/>
                     <Text style={styles.bText}>{this.state.dropOff}</Text>
                     <Input
@@ -459,8 +499,12 @@ export default class TabOneScreen extends Component {
                     <Image
                       source={require('../assets/images/man.png')}
                     />
-                    <Text h1>{this.state.riderDetails.rName}</Text>
-                    <Text h1>Plate No. {this.state.riderDetails.plateNo}</Text>
+                    <Text h3>{this.state.riderDetails.rName}</Text>
+                    <Text h3>Plate No. {this.state.riderDetails.plateNo}</Text>
+                    <Text h5>Phone: {this.state.riderDetails.rPhone}</Text>
+                    <Image
+                      source={require('../assets/images/loading.gif')}
+                    />
                   </View>
             :
               <View style={styles.loading}>
