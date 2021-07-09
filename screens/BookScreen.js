@@ -90,13 +90,14 @@ export default class TabOneScreen extends Component {
           `
         }
       }).then( result => {
-        // alert(JSON.stringify(result))
         this.setState({
           findingRider: true
         })
         this._searching(result.data.data.UserPendingTransactions._id)
       }).catch( err => {
-        this._accepted(this.state.userId)
+        this.setState({
+          findingRider: false
+        })
       })
     })
 
@@ -257,33 +258,7 @@ export default class TabOneScreen extends Component {
             Searching(TripId: "${id}"){
               _id
               Status
-            }
-          }
-        `
-      }
-    }).then(result => {
-      if (result.data.data.Searching.Status == "Accepted") {
-        this._accepted(this.state.userId)
-      } else {
-        this._searching(id)
-      }
-    }).catch(err => {
-      this.setState({
-        findingRider: false
-      })
-    })
-  }
-
-  _accepted = (id) => {
-    axios({
-      url: 'https://serene-cliffs-80945.herokuapp.com/api',
-      method: 'POST',
-      data: {
-        query:`
-          {
-            UserAcceptedTransactions( User:"${id}"){
-              _id
-              Status
+              Rate
               Driver {
                 FName
                 LName
@@ -296,53 +271,51 @@ export default class TabOneScreen extends Component {
         `
       }
     }).then(result => {
-      if (result.data.data.UserAcceptedTransactions.Status == "Accepted") {
-        this.setState({
-          findingRider: true,
-          riderDetails: {
-            rName: `${result.data.data.UserAcceptedTransactions.Driver.FName} ${result.data.data.UserAcceptedTransactions.Driver.LName}`,
-            plateNo: `${result.data.data.UserAcceptedTransactions.Driver.PlateNo}`,
-            rPhone: `${result.data.data.UserAcceptedTransactions.Driver.Phone}`
-          },
-          tripStatus: result.data.data.UserAcceptedTransactions.Status
-        });
-        this._accepted(id);
-      } else {
-        this._finishedTrip(result.data.data.UserAcceptedTransactions._id)
+
+      switch (result.data.data.Searching.Status) {
+        case "Accepted":
+            this.setState({
+              findingRider: true,
+              riderDetails: {
+                rName: `${result.data.data.Searching.Driver.FName} ${result.data.data.Searching.Driver.LName}`,
+                plateNo: `${result.data.data.Searching.Driver.PlateNo}`,
+                rPhone: `${result.data.data.Searching.Driver.Phone}`
+              },
+              tripStatus: result.data.data.Searching.Status
+            })
+
+            this._searching(id)
+          break;
+        case "Completed":
+            result.data.data.Searching.Rate == null ?
+              this.setState({
+                findingRider: true,
+                riderDetails: {
+                  rName: `${result.data.data.Searching.Driver.FName} ${result.data.data.Searching.Driver.LName}`,
+                  plateNo: `${result.data.data.Searching.Driver.PlateNo}`,
+                  rPhone: `${result.data.data.Searching.Driver.Phone}`
+                },
+                tripStatus: result.data.data.Searching.Status
+              })
+            : 
+              this.setState({
+                findingRider: false
+              })
+          break;
+        default:
+            this.setState({
+              findingRider: true,
+              tripStatus: result.data.data.Searching.Status
+            })
+
+            this._searching(id)
+          break;        
       }
+  
     }).catch(err => {
       this.setState({
         findingRider: false
       })
-    })
-  }
-
-  _finishedTrip = (id) => {
-    axios({
-      url: 'https://serene-cliffs-80945.herokuapp.com/api',
-      method: 'POST',
-      data: {
-        query:`
-          {
-            Searching(TripId: "${id}"){
-              _id
-              Status
-            }
-          }
-        `
-      }
-    }).then(result => {
-      result.data.data.Searching.Status == "Completed" ?
-        this.setState({
-          riderDetails: {
-            rName: "Mr. Juan dela cruz",
-            plateNo: "xxx-123"
-          },
-          tripStatus: result.data.data.Searching.Status
-        }) :
-      this._finishedTrip(id);
-    }).catch(err => {
-      alert(err)
     })
   }
 
