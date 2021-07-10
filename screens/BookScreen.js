@@ -20,6 +20,8 @@ export default class TabOneScreen extends Component {
   constructor(props) {
     super(props);
 
+    this._isMounted = false;
+
     this.state = {
       userId: null,
       dropOff: '',
@@ -31,6 +33,7 @@ export default class TabOneScreen extends Component {
       findingRider: false,
       tripStatus: null,
       riderDetails: null,
+      submitBtn: false,
       currentLocation: {
         longitude: 'unknown', //Initial Longitude
         latitude: 'unknown', //Initial Latitude
@@ -72,7 +75,13 @@ export default class TabOneScreen extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   componentDidMount = async () => {
+    this._isMounted = true;
+
     await AsyncStorage.getItem('userId').then(result => {
       result ? this.setState({ userId: result }) : this.props.navigation.navigate('Login');
 
@@ -240,7 +249,10 @@ export default class TabOneScreen extends Component {
     }).then( result => {
       // alert(JSON.stringify(result))
       this.setState({
-        findingRider: true
+        riderDetails: null,
+        tripStatus: "Pending",
+        findingRider: true,
+        submitBtn: false
       })
       this._searching(result.data.data.CreateTransaction._id)
     }).catch( err => {
@@ -404,8 +416,14 @@ export default class TabOneScreen extends Component {
                       onChangeText={value => this.setState({ notes: value })}
                     />
                     <Button
+                      disabled={this.state.submitBtn}
                       title='Book Now'
-                      onPress={() => this._book()}
+                      onPress={() => { 
+                        this.setState({
+                          submitBtn: true
+                        }) 
+                        this._book()
+                      }}
                     />
                 </Card>
               </View>
@@ -460,7 +478,8 @@ export default class TabOneScreen extends Component {
                       onPress={
                         () => {
                           this.setState({
-                            findingRider: null
+                            findingRider: null,
+                            book: false
                           })
                         }
                       }
