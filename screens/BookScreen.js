@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { LocationGeofencingEventType } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+import { getPreciseDistance } from 'geolib';
 import { Permissions } from 'expo';
 
 // import EditScreenInfo from '../components/EditScreenInfo';
@@ -14,6 +15,7 @@ import Geofence from 'react-native-expo-geofence';
 import { Card, Text, Input, Button, Badge } from 'react-native-elements';
 import axios from 'axios';
 import { ThemeProvider } from '@react-navigation/native';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 
 export default class TabOneScreen extends Component {
@@ -34,6 +36,8 @@ export default class TabOneScreen extends Component {
       tripStatus: null,
       riderDetails: null,
       submitBtn: false,
+      price: null,
+      baseFare: 20,
       currentLocation: {
         longitude: 'unknown', //Initial Longitude
         latitude: 'unknown', //Initial Latitude
@@ -80,6 +84,7 @@ export default class TabOneScreen extends Component {
   }
 
   componentDidMount = async () => {
+
     this._isMounted = true;
 
     await AsyncStorage.getItem('userId').then(result => {
@@ -234,7 +239,6 @@ export default class TabOneScreen extends Component {
               PickLong: ${this.state.currentLocation.longitude},
               DropLat: ${this.state.dropOffLoc.latitude},
               DropLong: ${this.state.dropOffLoc.longitude},
-              HubLocated: "Hub 33 caloocan",
               Status: "Pending"
             }){
               _id
@@ -258,6 +262,15 @@ export default class TabOneScreen extends Component {
     }).catch( err => {
       alert(err)
     })
+  }
+
+  _serviceFee = () => {
+
+    let meters = getPreciseDistance( { latitude: Number(this.state.currentLocation.latitude), longitude: Number(this.state.currentLocation.longitude) },{ latitude: Number(this.state.dropOffLoc.latitude), longitude: Number(this.state.dropOffLoc.longitude) } )
+    
+    this.setState({
+      price: Math.round((meters/1000) * 2 + this.state.baseFare)
+    });
   }
 
   _searching = (id) => {
@@ -407,6 +420,7 @@ export default class TabOneScreen extends Component {
                 <Card>
                   <Card.Title>Confirm Pick-up and Drop off</Card.Title>
                   <Card.Divider/>
+                    <Card.Title>₱ {this.state.price}</Card.Title>
                     <Badge status="primary" value={<Text style={styles.bText}>Pick Up: </Text>}/>
                     <Text style={styles.bText}>{this.state.address}</Text>
                     <Badge status="success" value={<Text style={styles.bText}>Drop Off: </Text>}/>
@@ -457,6 +471,7 @@ export default class TabOneScreen extends Component {
                         })
                       
                       await this._getAddress()
+                      await this._serviceFee()
                     }}
                   />
                 </View>

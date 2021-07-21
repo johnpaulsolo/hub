@@ -31,7 +31,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.sword123.hubsample"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
