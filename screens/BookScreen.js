@@ -239,7 +239,8 @@ export default class TabOneScreen extends Component {
               PickLong: ${this.state.currentLocation.longitude},
               DropLat: ${this.state.dropOffLoc.latitude},
               DropLong: ${this.state.dropOffLoc.longitude},
-              Status: "Pending"
+              Status: "Pending",
+              Price: ${this.state.price}
             }){
               _id
               PickLat
