@@ -251,7 +251,6 @@ export default class TabOneScreen extends Component {
         `
       }
     }).then( result => {
-      // alert(JSON.stringify(result))
       this.setState({
         riderDetails: null,
         tripStatus: "Pending",
@@ -346,29 +345,7 @@ export default class TabOneScreen extends Component {
 
   render() {
     // TODO: Payment fot google
-    // const origin = {latitude: 14.636869, longitude: 120.975428};
-    // const destination = {latitude: 14.632700, longitude: 120.974953};
     // const GOOGLE_MAPS_APIKEY = 'AIzaSyBotWB42sSAdM2vevI2iwuiIZ7nBMNl0BY';
-
-    function getlocation(title) {
-      alert(title)
-    }
-
-    async function search(location) {
-      const coords = await Location.geocodeAsync(location)
-      
-      await coords.length === 0 ? alert('place does not exist') : alert(JSON.stringify(coords))
-      // await alert(JSON.stringify(coords))
-      // this.setState({
-      //   coords: coords,
-      //   region: {
-      //     longitude: 14.636869,
-      //     latitude: 120.975428,
-      //     latitudeDelta: 0.0050,
-      //     longitudeDelta: 0.0050
-      //   }
-      // })
-    }
 
     return (
       <View style={styles.container}>
@@ -527,47 +504,10 @@ export default class TabOneScreen extends Component {
           null
         }
         
-        {/* <View style={styles.bottomCard}>
-          <Text>drop off : {this.state.dropOff}</Text>
-          <Text>ADDRESS : {JSON.stringify(this.state.address)}</Text>
-          <Text>COORDS : {JSON.stringify(this.state.coords)}</Text>
-          <Text>geo : {JSON.stringify(this.state.geofence)}</Text> */}
-          {/* <FlatList
-              style={{ paddingBottom: 10 }}
-              horizontal
-              data={this.state.markers}
-              
-              renderItem={({item}) => 
-                <Card>
-                  <Text style={{ color:'red' }}>{item.title}</Text>
-                  <Image 
-                    source={{ uri: 'https://i.pinimg.com/originals/7c/51/98/7c5198d2a0751fa76c8433dba4a1a12a.jpg' }}
-                    // style={{ width: 50, height: 50 }}
-                    resizeMode='center'
-                    />
-                  <Button
-                    title="book"
-                    onPress={() => this.selectTerminal(item.coordinates)}
-                  />
-                </Card>
-              }
-            /> */}
-        {/* </View> */}
       </View>
     );
   }
 }
-
-TaskManager.defineTask('first task', ({ data, error }) => {
-  if (error) {
-    // Error occurred - check `error.message` for more details.
-    return;
-  }
-  if (data) {
-    alert(JSON.stringify(data))
-    // do something with the locations captured in the background
-  }
-});
 
 const styles = StyleSheet.create({
   container: {
