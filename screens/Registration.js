@@ -61,6 +61,7 @@ class Registration extends Component {
                                 label="Password"
                                 onChangeText={(password) => this.setState({password: password})}
                                 placeholder="Password"
+                                secureTextEntry
                                 value={password} />
                             <Input
                                 label="Username"
@@ -73,6 +74,12 @@ class Registration extends Component {
                                 buttonStyle={{backgroundColor: '#e64343'}}
                                 title="Sign Up"
                                 onPress={this._signup}
+                            />
+
+                            <Button
+                                type="clear"
+                                title="Back"
+                                onPress={() => this.props.navigation.navigate('Login')}
                             />
                         </View>
                 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Button, Input, Card } from 'react-native-elements';
+import { Button, Input, Card, Image } from 'react-native-elements';
 
 import axios from 'axios';
 
@@ -121,6 +121,10 @@ const styles = StyleSheet.create({
     input: {
         borderBottomColor: "black",
         borderBottomWidth: 1
+    },
+    logo: {
+        height: 200,
+        width: 200
     }
 })
 

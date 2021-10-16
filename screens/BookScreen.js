@@ -16,6 +16,7 @@ import { Card, Text, Input, Button, Badge } from 'react-native-elements';
 import axios from 'axios';
 import { ThemeProvider } from '@react-navigation/native';
 import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 
 export default class TabOneScreen extends Component {
@@ -422,6 +423,19 @@ export default class TabOneScreen extends Component {
             :
               this.state.region.latitude ?
                 <View style={styles.search}>
+                  <GooglePlacesAutocomplete
+                    placeholder='Search'
+                    onPress={(data, details = null) => {
+                      // 'details' is provided when fetchDetails = true
+                      // console.log(data, details);
+                      alert(JSON.stringify(data))
+                    }}
+                    query={{
+                      key: 'AIzaSyA58dN1sKKItLTUMRXJhzUv5PZQer2v7FU',
+                      language: 'en',
+                      components: 'country:ph',
+                    }}
+                  />
                   <Input
                     placeholder='Drop Off Location'
                     onChangeText={value => this.setState({ dropOff: value })}
