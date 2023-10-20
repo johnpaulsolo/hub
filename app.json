@@ -26,7 +26,8 @@
           "location",
           "fetch"
         ]
-      }
+      },
+      "bundleIdentifier": "com.sword123.hubsample"
     },
     "android": {
       "adaptiveIcon": {

@@ -16,8 +16,6 @@
       "developmentClient": true,
       "channel": "preview3"
     },
-    "production": {
-      "channel": "production"
-    }
+    "production": {}
   }
 }
