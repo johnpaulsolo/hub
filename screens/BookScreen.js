@@ -27,7 +27,7 @@ export default class TabOneScreen extends Component {
 
     this.state = {
       userId: null,
-      dropOff: null,
+      dropOff: '',
       address: null,
       coords: null,
       geofence: null,
@@ -370,7 +370,7 @@ export default class TabOneScreen extends Component {
                   coordinate={this.state.currentLocation}
                   title={'your location'}
                 ></Marker>
-                {this.state.dropOffLoc.latitude ? 
+                {this.state.book ? 
                   <Marker
                     coordinate={this.state.dropOffLoc}
                     image={require('../assets/images/loc.png')}
@@ -425,12 +425,25 @@ export default class TabOneScreen extends Component {
                 <View style={styles.search}>
                   <GooglePlacesAutocomplete
                     placeholder='Search'
-                    onPress={async (data, details = null) => {
+                    onPress={(data, details = null) => {
                       // 'details' is provided when fetchDetails = true
                       // console.log(data, details);
-                      // alert(JSON.stringify(details.description))
-                      await this.setState({ dropOff: details.description })
-
+                      alert(JSON.stringify(data))
+                    }}
+                    query={{
+                      key: 'AIzaSyA58dN1sKKItLTUMRXJhzUv5PZQer2v7FU',
+                      language: 'en',
+                      components: 'country:ph',
+                    }}
+                  />
+                  <Input
+                    placeholder='Drop Off Location'
+                    onChangeText={value => this.setState({ dropOff: value })}
+                  />
+                  <Button
+                    title='search'
+                    onPress={async () => {
+                      // search(this.state.dropOff)
                       const coords = await Location.geocodeAsync(this.state.dropOff)
 
                       await coords.length === 0 ? 
@@ -445,24 +458,10 @@ export default class TabOneScreen extends Component {
                           dropOffLoc: {
                             latitude: coords[0].latitude,
                             longitude: coords[0].longitude
-                          }
+                          },
+                          book: true
                         })
-                    }}
-                    query={{
-                      key: 'AIzaSyA58dN1sKKItLTUMRXJhzUv5PZQer2v7FU',
-                      language: 'en',
-                      components: 'country:ph',
-                    }}
-                  />
-                  {/* <Input
-                    placeholder='Drop Off Location'
-                    onChangeText={value => this.setState({ dropOff: value })}
-                  /> */}
-                  <Button
-                    title='Next'
-                    onPress={async () => {
-                      // search(this.state.dropOff)         
-                      this.setState({ book: true })             
+                      
                       await this._getAddress()
                       await this._serviceFee()
                     }}
